@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import * as nodemailer from 'nodemailer';
 import { SendMailOptions } from 'nodemailer';
 
 // async function createTestCreds() {
@@ -7,7 +7,7 @@ import { SendMailOptions } from 'nodemailer';
 // }
 
 export async function sendEmail(payload: SendMailOptions) {
-  const creds = await nodemailer.createTestAccount();
+  const creds = await await nodemailer.createTestAccount();
 
   const smtp = {
     user: creds.user,

@@ -1,9 +1,9 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class VerifyEmailDto {
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  userId: number;
+  userId: string;
 
   @IsString({ message: '"token" should be a valid string' })
   @IsNotEmpty()

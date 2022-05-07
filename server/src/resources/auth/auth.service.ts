@@ -47,8 +47,8 @@ export class AuthService {
     if (!newUser) throw new BadRequestException('Failed to create user');
 
     await sendEmail({
-      from: 'sportscomplex@info.com',
-      to: user.email,
+      from: 'picitt@info.com',
+      to: newUser.email,
       subject: 'Verify your email',
       html: `<html>
       <h1>Email verification</h1>
@@ -86,6 +86,10 @@ export class AuthService {
 
     if (!user) throw new NotFoundException('No user found');
 
+    if (!user.isEmailVerified) {
+      throw new BadRequestException('User not verified');
+    }
+
     if (await bcrypt.compare(data.password, user.password)) {
       return user;
     } else {
@@ -95,12 +99,20 @@ export class AuthService {
 
   async verifyEmail(data: VerifyEmailDto) {
     const user = await this.prisma.users.findFirst({
-      where: { id: data.userId, emailVerificationToken: data.token },
+      where: { id: Number(data.userId), emailVerificationToken: data.token },
     });
 
     if (!user) throw new NotFoundException('No user found');
 
-    return user;
+    const updatedUser = await this.prisma.users.update({
+      where: { id: Number(data.userId) },
+      data: {
+        emailVerificationToken: '',
+        isEmailVerified: true,
+      },
+    });
+
+    return updatedUser;
   }
 
   recoverPassword(id: number) {
