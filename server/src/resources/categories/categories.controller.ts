@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { SearchCategoriesDto } from './dto/search-categories.dto';
 
 @Controller('categories')
 export class CategoriesController {
@@ -12,7 +13,7 @@ export class CategoriesController {
   }
 
   @Get()
-  filterCategories() {
-    return this.categoriesService.filterCategories();
+  filterCategories(@Body() search: SearchCategoriesDto) {
+    return this.categoriesService.filterCategories(search.name);
   }
 }

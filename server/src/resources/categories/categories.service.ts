@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 
@@ -7,14 +11,29 @@ export class CategoriesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateCategoryDto) {
-    const category = await this.prisma.categories.create({ data: { ...data } });
+    const user = await this.prisma.users.findUnique({
+      where: { id: Number(data.createdBy) },
+    });
+
+    if (!user) {
+      throw new NotFoundException('No user found');
+    }
+    const category = await this.prisma.categories.create({
+      data: { ...data },
+    });
 
     if (!category) throw new BadRequestException('Failed to create category');
 
     return category;
   }
 
-  filterCategories() {
-    return `This action returns all categories`;
+  async filterCategories(search: string) {
+    return await this.prisma.categories.findMany({
+      where: {
+        name: {
+          contains: search,
+        },
+      },
+    });
   }
 }
