@@ -67,18 +67,20 @@ model posts {
 }
 
 model users {
-  id         Int          @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
-  name       String       @db.VarChar(127)
-  username   String       @unique(map: "username_UNIQUE") @db.VarChar(45)
-  email      String       @unique(map: "email_UNIQUE") @db.VarChar(127)
-  password   String       @db.VarChar(127)
-  birthdate  DateTime?    @db.Date
-  createdAt  DateTime?    @default(now()) @db.DateTime(0)
-  updatedAt  DateTime?    @default(now()) @db.DateTime(0)
-  bio        String?      @db.VarChar(127)
-  image      String?      @db.VarChar(255)
-  categories categories[]
-  comments   comments[]
-  likes      likes[]      @ignore
-  posts      posts[]
+  id                     Int          @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
+  name                   String       @db.VarChar(127)
+  username               String       @unique(map: "username_UNIQUE") @db.VarChar(45)
+  email                  String       @unique(map: "email_UNIQUE") @db.VarChar(127)
+  password               String       @db.VarChar(127)
+  birthdate              DateTime?    @db.Date
+  createdAt              DateTime?    @default(now()) @db.DateTime(0)
+  updatedAt              DateTime?    @default(now()) @db.DateTime(0)
+  bio                    String?      @db.VarChar(127)
+  image                  String?      @db.VarChar(255)
+  isEmailVerified        Boolean?     @default(false)
+  emailVerificationToken String?      @db.VarChar(125)
+  categories             categories[]
+  comments               comments[]
+  likes                  likes[]      @ignore
+  posts                  posts[]
 }
