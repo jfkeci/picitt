@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model categories {
+  id        Int       @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
+  name      String    @unique(map: "name_UNIQUE") @db.VarChar(127)
+  createdBy Int       @db.UnsignedInt
+  createdAt DateTime? @default(now()) @db.DateTime(0)
+  updatedAt DateTime? @default(now()) @db.DateTime(0)
+  users     users     @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_created_category")
+  posts     posts[]
+
+  @@index([createdBy], map: "user_created_category_idx")
+}
+
+model comments {
+  id        Int       @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
+  createdBy Int       @db.UnsignedInt
+  text      String    @db.VarChar(510)
+  createdAt DateTime? @default(now()) @db.DateTime(0)
+  updatedAt DateTime? @default(now()) @db.DateTime(0)
+  postId    Int       @db.UnsignedInt
+  users     users     @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comment_user")
+  posts     posts     @relation(fields: [postId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comment_post")
+
+  @@index([postId], map: "comment_post")
+  @@index([createdBy], map: "comment_user_idx")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model likes {
+  postId    Int       @db.UnsignedInt
+  userId    Int       @db.UnsignedInt
+  createdAt DateTime? @default(now()) @db.DateTime(0)
+  posts     posts     @relation(fields: [postId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "like_post")
+  users     users     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "like_user")
+
+  @@index([postId], map: "like_post")
+  @@index([userId], map: "like_user_idx")
+  @@ignore
+}
+
+model posts {
+  id         Int        @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
+  title      String     @db.VarChar(127)
+  body       String?    @db.VarChar(255)
+  createdAt  DateTime?  @default(now()) @db.DateTime(0)
+  updatedAt  DateTime?  @default(now()) @db.DateTime(0)
+  location   Json?
+  createdBy  Int        @db.UnsignedInt
+  tags       Json?
+  category   Int        @db.UnsignedInt
+  images     Json
+  categories categories @relation(fields: [category], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "post_category")
+  users      users      @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_post")
+  comments   comments[]
+  likes      likes[]    @ignore
+
+  @@index([category], map: "post_category_idx")
+  @@index([createdBy], map: "users_post_idx")
+}
+
+model users {
+  id         Int          @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
+  name       String       @db.VarChar(127)
+  username   String       @unique(map: "username_UNIQUE") @db.VarChar(45)
+  email      String       @unique(map: "email_UNIQUE") @db.VarChar(127)
+  password   String       @db.VarChar(127)
+  birthdate  DateTime?    @db.Date
+  createdAt  DateTime?    @default(now()) @db.DateTime(0)
+  updatedAt  DateTime?    @default(now()) @db.DateTime(0)
+  bio        String?      @db.VarChar(127)
+  image      String?      @db.VarChar(255)
+  categories categories[]
+  comments   comments[]
+  likes      likes[]      @ignore
+  posts      posts[]
+}
