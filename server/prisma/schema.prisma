@@ -20,14 +20,15 @@ model categories {
 }
 
 model comments {
-  id        Int       @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
-  createdBy Int       @db.UnsignedInt
-  text      String    @db.VarChar(510)
-  createdAt DateTime? @default(now()) @db.DateTime(0)
-  updatedAt DateTime? @default(now()) @db.DateTime(0)
-  postId    Int       @db.UnsignedInt
-  users     users     @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comment_user")
-  posts     posts     @relation(fields: [postId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comment_post")
+  id            Int             @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
+  createdBy     Int             @db.UnsignedInt
+  text          String          @db.VarChar(510)
+  createdAt     DateTime?       @default(now()) @db.DateTime(0)
+  updatedAt     DateTime?       @default(now()) @db.DateTime(0)
+  postId        Int             @db.UnsignedInt
+  users         users           @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comment_user")
+  posts         posts           @relation(fields: [postId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comment_post")
+  comment_likes comment_likes[] @ignore
 
   @@index([postId], map: "comment_post")
   @@index([createdBy], map: "comment_user_idx")
@@ -67,20 +68,33 @@ model posts {
 }
 
 model users {
-  id                     Int          @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
-  name                   String       @db.VarChar(127)
-  username               String       @unique(map: "username_UNIQUE") @db.VarChar(45)
-  email                  String       @unique(map: "email_UNIQUE") @db.VarChar(127)
-  password               String       @db.VarChar(127)
-  birthdate              DateTime?    @db.Date
-  createdAt              DateTime?    @default(now()) @db.DateTime(0)
-  updatedAt              DateTime?    @default(now()) @db.DateTime(0)
-  bio                    String?      @db.VarChar(127)
-  image                  String?      @db.VarChar(255)
-  isEmailVerified        Boolean?     @default(false)
-  emailVerificationToken String?      @db.VarChar(125)
+  id                     Int             @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
+  name                   String          @db.VarChar(127)
+  username               String          @unique(map: "username_UNIQUE") @db.VarChar(45)
+  email                  String          @unique(map: "email_UNIQUE") @db.VarChar(127)
+  password               String          @db.VarChar(127)
+  birthdate              DateTime?       @db.Date
+  createdAt              DateTime?       @default(now()) @db.DateTime(0)
+  updatedAt              DateTime?       @default(now()) @db.DateTime(0)
+  bio                    String?         @db.VarChar(127)
+  image                  String?         @db.VarChar(255)
+  isEmailVerified        Boolean?        @default(false)
+  emailVerificationToken String?         @db.VarChar(125)
   categories             categories[]
+  comment_likes          comment_likes[] @ignore
   comments               comments[]
-  likes                  likes[]      @ignore
+  likes                  likes[]         @ignore
   posts                  posts[]
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model comment_likes {
+  userId    Int      @db.UnsignedInt
+  commentId Int      @db.UnsignedInt
+  comments  comments @relation(fields: [commentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comment_like_comment")
+  users     users    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comment_like_user")
+
+  @@index([commentId], map: "comment_like_comment_idx")
+  @@index([userId], map: "comment_like_user_idx")
+  @@ignore
 }

@@ -1,26 +1,77 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 
 @Injectable()
 export class PostsService {
-  create(createPostDto: CreatePostDto) {
-    return 'This action adds a new post';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(data: CreatePostDto) {
+    const user = await this.prisma.users.findUnique({
+      where: { id: data.createdBy },
+    });
+
+    if (!user) throw new NotFoundException('No user found');
+
+    const category = await this.prisma.categories.findUnique({
+      where: { id: data.category },
+    });
+
+    if (!category) throw new NotFoundException('No category found');
+
+    const newPost = await this.prisma.posts.create({
+      data: {
+        title: data.title,
+        createdBy: data.createdBy,
+        category: data.category,
+        images: data.images,
+        tags: data.tags,
+        location: data.location ? { ...data.location } : null,
+      },
+    });
+
+    if (!newPost) throw new BadRequestException('Failed to create new post');
+
+    return newPost;
   }
 
-  findAll() {
-    return `This action returns all posts`;
+  async findAll() {
+    const posts = await this.prisma.posts.findMany({});
+
+    if (!posts) throw new NotFoundException('No posts found');
+
+    return posts;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
+  async findOne(id: number) {
+    const post = await this.prisma.posts.findUnique({ where: { id: id } });
+
+    if (!post) throw new NotFoundException('No post found');
+
+    return post;
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+  async update(id: number, data: UpdatePostDto) {
+    const updatedPost = await this.prisma.posts.update({
+      where: { id },
+      data: { ...data, location: data.location ? { ...data.location } : null },
+    });
+
+    if (!updatedPost) throw new BadRequestException('Failed to update post');
+
+    return updatedPost;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async remove(id: number) {
+    const deletedPost = await this.prisma.posts.delete({ where: { id } });
+
+    if (!deletedPost) throw new BadRequestException('Failed to delete post');
+
+    return deletedPost;
   }
 }
