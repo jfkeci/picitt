@@ -26,12 +26,12 @@ export class FollowersController {
   }
 
   @Get('/followers/:userId')
-  getUserFollowers(@Param() param: UserIdParamDto) {
-    return this.followersService.getUserFollowers(param.userId);
+  getUserFollowers(@Param('userId') userId) {
+    return this.followersService.getUserFollowers(Number(userId));
   }
 
   @Get('/following/:userId')
-  getUserFollowing(@Param() param: UserIdParamDto) {
-    return this.followersService.getUserFollowing(param.userId);
+  getUserFollowing(@Param('userId') userId) {
+    return this.followersService.getUserFollowing(Number(userId));
   }
 }

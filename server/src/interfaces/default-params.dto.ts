@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class DefaultIdParamDto {
   @IsNumber()
@@ -7,9 +7,9 @@ export class DefaultIdParamDto {
 }
 
 export class UserIdParamDto {
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  userId: number;
+  userId: string;
 }
 
 export class PostIdParamDto {

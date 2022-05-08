@@ -51,7 +51,13 @@ export class FollowersService {
   async getUserFollowers(userId: number) {
     const followers = await this.prisma.followers.findMany({
       where: { following: userId },
-      include: { users_followers_followingTousers: true },
+      include: {
+        users_followers_followingTousers: {
+          select: {
+            username: true,
+          },
+        },
+      },
     });
 
     if (!followers) throw new NotFoundException('No followers found');
@@ -62,7 +68,13 @@ export class FollowersService {
   async getUserFollowing(userId: number) {
     const following = await this.prisma.followers.findMany({
       where: { following: userId },
-      include: { users_followers_followerTousers: true },
+      include: {
+        users_followers_followerTousers: {
+          select: {
+            username: true,
+          },
+        },
+      },
     });
 
     if (!following) throw new NotFoundException('No users found');
