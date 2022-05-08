@@ -38,7 +38,7 @@ export class CategoriesService {
     });
   }
 
-  async getCategoryPosts(categoryId: number) {
+  async getCategoryWithPosts(categoryId: number) {
     const categoryWithPosts = await this.prisma.categories.findUnique({
       where: { id: categoryId },
       include: { posts: true },

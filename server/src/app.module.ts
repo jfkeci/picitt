@@ -7,6 +7,8 @@ import { PostsModule } from './resources/posts/posts.module';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
+import { PostLikesModule } from './resources/post-likes/post-likes.module';
+import { CommentLikesModule } from './resources/comment-likes/comment-likes.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { AuthGuard } from './guards/auth.guard';
     CategoriesModule,
     PostsModule,
     ConfigModule.forRoot(),
+    PostLikesModule,
+    CommentLikesModule,
   ],
   providers: [
     {
