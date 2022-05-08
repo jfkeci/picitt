@@ -9,6 +9,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { PostLikesModule } from './resources/post-likes/post-likes.module';
 import { CommentLikesModule } from './resources/comment-likes/comment-likes.module';
+import { CommentsModule } from './resources/comments/comments.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CommentLikesModule } from './resources/comment-likes/comment-likes.modu
     ConfigModule.forRoot(),
     PostLikesModule,
     CommentLikesModule,
+    CommentsModule,
   ],
   providers: [
     {
