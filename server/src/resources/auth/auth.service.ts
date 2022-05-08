@@ -9,7 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import * as bcrypt from 'bcrypt';
-import { generateToken } from 'src/utils/gen-token.util';
+import { generateJwt, generateToken } from 'src/utils/gen-token.util';
 import { sendEmail } from 'src/utils/mailer.util';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 
@@ -91,7 +91,10 @@ export class AuthService {
     }
 
     if (await bcrypt.compare(data.password, user.password)) {
-      return user;
+      return {
+        ...user,
+        token: generateJwt({ id: user.id, username: user.username }),
+      };
     } else {
       throw new UnauthorizedException('Not authorised');
     }
