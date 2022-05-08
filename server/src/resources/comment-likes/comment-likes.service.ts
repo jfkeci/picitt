@@ -38,10 +38,24 @@ export class CommentLikesService {
     return await this.getCommentLikes(like.commentId);
   }
 
+  async getLikeCount(id: number) {
+    const count = await this.prisma.comment_likes.count({ where: { id } });
+
+    if (!count) throw new BadRequestException('Failed to get like count');
+
+    return count;
+  }
+
   async getCommentLikes(commentId: number) {
     const likes = await this.prisma.comment_likes.findMany({
       where: { commentId: commentId },
-      include: { users: true },
+      include: {
+        users: {
+          select: {
+            username: true,
+          },
+        },
+      },
     });
 
     return likes;
