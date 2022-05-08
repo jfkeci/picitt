@@ -10,6 +10,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { PostLikesModule } from './resources/post-likes/post-likes.module';
 import { CommentLikesModule } from './resources/comment-likes/comment-likes.module';
 import { CommentsModule } from './resources/comments/comments.module';
+import { FollowersModule } from './resources/followers/followers.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CommentsModule } from './resources/comments/comments.module';
     PostLikesModule,
     CommentLikesModule,
     CommentsModule,
+    FollowersModule,
   ],
   providers: [
     {
