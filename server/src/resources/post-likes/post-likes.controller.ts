@@ -1,6 +1,6 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { PostLikesService } from './post-likes.service';
-import { LikePostDto } from './dto/loke-post.dto';
+import { LikePostDto } from './dto/like-post.dto';
 
 @Controller('post-likes')
 export class PostLikesController {

@@ -1,26 +1,49 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCommentLikeDto } from './dto/create-comment-like.dto';
-import { UpdateCommentLikeDto } from './dto/update-comment-like.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { LikeCommentDto } from './dto/like-comment.dto';
 
 @Injectable()
 export class CommentLikesService {
-  create(createCommentLikeDto: CreateCommentLikeDto) {
-    return 'This action adds a new commentLike';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async likeComment(data: LikeCommentDto) {
+    const user = await this.prisma.users.findUnique({
+      where: { id: data.userId },
+    });
+
+    if (!user) throw new NotFoundException('No user found');
+
+    const comment = await this.prisma.comments.findUnique({
+      where: { id: data.commentId },
+    });
+
+    if (!comment) throw new NotFoundException('No comment found');
+
+    const newLike = await this.prisma.comment_likes.create({ data: data });
+
+    if (!newLike) throw new BadRequestException('Failed to save like');
+
+    return newLike;
   }
 
-  findAll() {
-    return `This action returns all commentLikes`;
+  async deleteLike(id: number) {
+    const like = await this.prisma.comment_likes.delete({ where: { id } });
+
+    if (!like) throw new NotFoundException('Failed unliking comment');
+
+    return await this.getCommentLikes(like.commentId);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} commentLike`;
-  }
+  async getCommentLikes(commentId: number) {
+    const likes = await this.prisma.comment_likes.findMany({
+      where: { commentId: commentId },
+      include: { users: true },
+    });
 
-  update(id: number, updateCommentLikeDto: UpdateCommentLikeDto) {
-    return `This action updates a #${id} commentLike`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} commentLike`;
+    return likes;
   }
 }
