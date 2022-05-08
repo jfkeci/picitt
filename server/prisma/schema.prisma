@@ -34,57 +34,48 @@ model comments {
   @@index([createdBy], map: "comment_user_idx")
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-model likes {
-  postId    Int       @db.UnsignedInt
-  userId    Int       @db.UnsignedInt
-  createdAt DateTime? @default(now()) @db.DateTime(0)
-  posts     posts     @relation(fields: [postId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "like_post")
-  users     users     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "like_user")
-
-  @@index([postId], map: "like_post")
-  @@index([userId], map: "like_user_idx")
-  @@ignore
-}
-
 model posts {
-  id         Int        @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
-  title      String     @db.VarChar(127)
-  body       String?    @db.VarChar(255)
-  createdAt  DateTime?  @default(now()) @db.DateTime(0)
-  updatedAt  DateTime?  @default(now()) @db.DateTime(0)
+  id         Int          @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
+  title      String       @db.VarChar(127)
+  body       String?      @db.VarChar(255)
+  createdAt  DateTime?    @default(now()) @db.DateTime(0)
+  updatedAt  DateTime?    @default(now()) @db.DateTime(0)
   location   Json?
-  createdBy  Int        @db.UnsignedInt
+  createdBy  Int          @db.UnsignedInt
   tags       Json?
-  category   Int        @db.UnsignedInt
+  category   Int          @db.UnsignedInt
   images     Json
-  categories categories @relation(fields: [category], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "post_category")
-  users      users      @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_post")
+  categories categories   @relation(fields: [category], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "post_category")
+  users      users        @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_post")
   comments   comments[]
-  likes      likes[]    @ignore
+  post_likes post_likes[] @ignore
 
   @@index([category], map: "post_category_idx")
   @@index([createdBy], map: "users_post_idx")
 }
 
 model users {
-  id                     Int             @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
-  name                   String          @db.VarChar(127)
-  username               String          @unique(map: "username_UNIQUE") @db.VarChar(45)
-  email                  String          @unique(map: "email_UNIQUE") @db.VarChar(127)
-  password               String          @db.VarChar(127)
-  birthdate              DateTime?       @db.Date
-  createdAt              DateTime?       @default(now()) @db.DateTime(0)
-  updatedAt              DateTime?       @default(now()) @db.DateTime(0)
-  bio                    String?         @db.VarChar(127)
-  image                  String?         @db.VarChar(255)
-  isEmailVerified        Boolean?        @default(false)
-  emailVerificationToken String?         @db.VarChar(125)
-  categories             categories[]
-  comment_likes          comment_likes[] @ignore
-  comments               comments[]
-  likes                  likes[]         @ignore
-  posts                  posts[]
+  id                                         Int             @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
+  name                                       String          @db.VarChar(127)
+  username                                   String          @unique(map: "username_UNIQUE") @db.VarChar(45)
+  email                                      String          @unique(map: "email_UNIQUE") @db.VarChar(127)
+  password                                   String          @db.VarChar(127)
+  birthdate                                  DateTime?       @db.Date
+  createdAt                                  DateTime?       @default(now()) @db.DateTime(0)
+  updatedAt                                  DateTime?       @default(now()) @db.DateTime(0)
+  bio                                        String?         @db.VarChar(127)
+  image                                      String?         @db.VarChar(255)
+  isEmailVerified                            Boolean?        @default(false)
+  emailVerificationToken                     String?         @db.VarChar(125)
+  categories                                 categories[]
+  comment_likes                              comment_likes[] @ignore
+  comments                                   comments[]
+  followers_followers_followerTousers        followers?      @relation("followers_followerTousers")
+  followers_followers_followingTousers       followers[]     @relation("followers_followingTousers")
+  notifications_notifications_ownerIdTousers notifications[] @relation("notifications_ownerIdTousers")
+  notifications_notifications_subjectTousers notifications[] @relation("notifications_subjectTousers")
+  post_likes                                 post_likes[]    @ignore
+  posts                                      posts[]
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
@@ -97,4 +88,43 @@ model comment_likes {
   @@index([commentId], map: "comment_like_comment_idx")
   @@index([userId], map: "comment_like_user_idx")
   @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model post_likes {
+  postId    Int       @db.UnsignedInt
+  userId    Int       @db.UnsignedInt
+  createdAt DateTime? @default(now()) @db.DateTime(0)
+  posts     posts     @relation(fields: [postId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "like_post")
+  users     users     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "like_user")
+
+  @@index([postId], map: "like_post")
+  @@index([userId], map: "like_user_idx")
+  @@ignore
+}
+
+model notifications {
+  id                                 Int       @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
+  subject                            String?   @db.VarChar(45)
+  activity                           String?   @db.VarChar(45)
+  object                             String?   @db.VarChar(45)
+  objectId                           Int?      @db.UnsignedInt
+  ownerId                            Int       @db.UnsignedInt
+  createdAt                          DateTime? @default(now()) @db.DateTime(0)
+  seen                               Boolean?  @default(false)
+  users_notifications_ownerIdTousers users     @relation("notifications_ownerIdTousers", fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "notification_owner")
+  users_notifications_subjectTousers users?    @relation("notifications_subjectTousers", fields: [subject], references: [username], onDelete: NoAction, onUpdate: NoAction, map: "notification_subject")
+
+  @@index([ownerId], map: "notification_owner_idx")
+  @@index([subject], map: "notification_subject_idx")
+}
+
+model followers {
+  follower                         Int      @unique(map: "follower_UNIQUE") @default(autoincrement()) @db.UnsignedInt
+  following                        Int      @db.UnsignedInt
+  createdAt                        DateTime @default(now()) @db.DateTime(0)
+  users_followers_followerTousers  users    @relation("followers_followerTousers", fields: [follower], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_follower")
+  users_followers_followingTousers users    @relation("followers_followingTousers", fields: [following], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_following")
+
+  @@index([following], map: "user_following_idx")
 }

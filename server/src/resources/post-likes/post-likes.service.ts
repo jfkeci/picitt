@@ -1,26 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePostLikeDto } from './dto/create-post-like.dto';
-import { UpdatePostLikeDto } from './dto/update-post-like.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { LikePostDto } from './dto/loke-post.dto';
 
 @Injectable()
 export class PostLikesService {
-  create(createPostLikeDto: CreatePostLikeDto) {
-    return 'This action adds a new postLike';
-  }
+  constructor(private readonly prisma: PrismaService) {}
 
-  findAll() {
-    return `This action returns all postLikes`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} postLike`;
-  }
-
-  update(id: number, updatePostLikeDto: UpdatePostLikeDto) {
-    return `This action updates a #${id} postLike`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} postLike`;
+  async likePost(data: LikePostDto) {
+    return 'a';
   }
 }
