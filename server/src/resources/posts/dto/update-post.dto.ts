@@ -19,13 +19,17 @@ class LocationObject {
   @IsString()
   @IsNotEmpty()
   lng: string;
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 }
 
 export class UpdatePostDto {
   @IsString({ message: '"title" should be a valid string' })
   @Length(1, 127)
   @IsNotEmpty()
-  title: string;
+  @IsOptional()
+  title?: string;
 
   @IsString({ message: '"title" should be a valid string' })
   @Length(1, 255)

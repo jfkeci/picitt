@@ -19,6 +19,9 @@ class LocationObject {
   @IsString()
   @IsNotEmpty()
   lng: string;
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 }
 
 export class CreatePostDto {
