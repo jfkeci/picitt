@@ -37,4 +37,15 @@ export class CategoriesService {
       },
     });
   }
+
+  async getCategoryPosts(categoryId: number) {
+    const categoryWithPosts = await this.prisma.categories.findUnique({
+      where: { id: categoryId },
+      include: { posts: true },
+    });
+
+    if (!categoryWithPosts) throw new NotFoundException('Not found');
+
+    return categoryWithPosts;
+  }
 }
