@@ -18,6 +18,7 @@ export class CategoriesService {
     if (!user) {
       throw new NotFoundException('No user found');
     }
+
     const category = await this.prisma.categories.create({
       data: { ...data },
     });

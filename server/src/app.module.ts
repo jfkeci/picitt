@@ -5,6 +5,8 @@ import { UserModule } from './resources/user/user.module';
 import { CategoriesModule } from './resources/categories/categories.module';
 import { PostsModule } from './resources/posts/posts.module';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './guards/auth.guard';
 
 @Module({
   imports: [
@@ -14,6 +16,12 @@ import { ConfigModule } from '@nestjs/config';
     CategoriesModule,
     PostsModule,
     ConfigModule.forRoot(),
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
   ],
 })
 export class AppModule {}

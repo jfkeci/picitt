@@ -74,7 +74,7 @@ export class AuthService {
       throw new BadRequestException('Provide email or username with password');
     }
 
-    if (!data.username || !data.email) {
+    if (!data.username && !data.email) {
       throw new BadRequestException('Provide email or username');
     } else if (data.username) {
       query = { username: data.username };
@@ -93,7 +93,7 @@ export class AuthService {
     if (await bcrypt.compare(data.password, user.password)) {
       return {
         ...user,
-        token: generateJwt({ id: user.id, username: user.username }),
+        token: await generateJwt({ id: user.id, username: user.username }),
       };
     } else {
       throw new UnauthorizedException('Not authorised');
