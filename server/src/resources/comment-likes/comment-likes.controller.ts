@@ -1,12 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Post, Body, Delete, Param, Get } from '@nestjs/common';
+import { CommentIdParamDto } from 'src/interfaces/default-params.dto';
 import { CommentLikesService } from './comment-likes.service';
 import { LikeCommentDto } from './dto/like-comment.dto';
 
@@ -14,8 +7,18 @@ import { LikeCommentDto } from './dto/like-comment.dto';
 export class CommentLikesController {
   constructor(private readonly commentLikesService: CommentLikesService) {}
 
+  @Get('/:postId')
+  getCommentLikes(@Param() param: CommentIdParamDto) {
+    return this.commentLikesService.getCommentLikes(param.commentId);
+  }
+
   @Post()
   likeComment(@Body() data: LikeCommentDto) {
     return this.commentLikesService.likeComment(data);
+  }
+
+  @Delete()
+  unlikeComment(@Body() data: LikeCommentDto) {
+    return this.commentLikesService.deleteLike(data);
   }
 }

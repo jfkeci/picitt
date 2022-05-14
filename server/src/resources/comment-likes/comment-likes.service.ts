@@ -30,12 +30,14 @@ export class CommentLikesService {
     return newLike;
   }
 
-  async deleteLike(id: number) {
-    const like = await this.prisma.comment_likes.delete({ where: { id } });
+  async deleteLike(data: LikeCommentDto) {
+    const like = await this.prisma.comment_likes.deleteMany({
+      where: { userId: data.userId, commentId: data.commentId },
+    });
 
     if (!like) throw new NotFoundException('Failed unliking comment');
 
-    return await this.getCommentLikes(like.commentId);
+    return await this.getCommentLikes(like[0]['commentId']);
   }
 
   async getLikeCount(id: number) {
@@ -58,6 +60,9 @@ export class CommentLikesService {
       },
     });
 
-    return likes;
+    return {
+      likes,
+      count: likes.length,
+    };
   }
 }
