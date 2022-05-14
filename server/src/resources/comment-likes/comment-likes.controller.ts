@@ -7,7 +7,7 @@ import { LikeCommentDto } from './dto/like-comment.dto';
 export class CommentLikesController {
   constructor(private readonly commentLikesService: CommentLikesService) {}
 
-  @Get('/:postId')
+  @Get('/:commentId')
   getCommentLikes(@Param() param: CommentIdParamDto) {
     return this.commentLikesService.getCommentLikes(param.commentId);
   }

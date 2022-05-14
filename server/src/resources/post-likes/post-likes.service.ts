@@ -27,15 +27,17 @@ export class PostLikesService {
 
     if (!newLike) throw new BadRequestException('Failed to save like');
 
-    return newLike;
+    return await this.getPostLikes(data.postId);
   }
 
-  async deleteLike(id: number) {
-    const like = await this.prisma.post_likes.delete({ where: { id } });
+  async deleteLike(data: LikePostDto) {
+    const likes = await this.prisma.post_likes.deleteMany({
+      where: { userId: data.userId, postId: data.postId },
+    });
 
-    if (!like) throw new NotFoundException('Failed unliking post');
+    if (!likes) throw new NotFoundException('Failed unliking post');
 
-    return await this.getPostLikes(like.postId);
+    return await this.getPostLikes(likes[0]['postId']);
   }
 
   async getLikeCount(id: number) {
@@ -58,6 +60,9 @@ export class PostLikesService {
       },
     });
 
-    return likes;
+    return {
+      likes,
+      count: likes.length,
+    };
   }
 }

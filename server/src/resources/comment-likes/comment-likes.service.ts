@@ -27,7 +27,7 @@ export class CommentLikesService {
 
     if (!newLike) throw new BadRequestException('Failed to save like');
 
-    return newLike;
+    return await this.getCommentLikes(data.commentId);
   }
 
   async deleteLike(data: LikeCommentDto) {
