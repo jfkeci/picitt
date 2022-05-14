@@ -18,20 +18,18 @@ export class PostsService {
 
     if (!user) throw new NotFoundException('No user found');
 
-    const category = await this.prisma.categories.findUnique({
-      where: { id: data.category },
-    });
+    if (data.category) {
+      const category = await this.prisma.categories.findUnique({
+        where: { id: data.category },
+      });
 
-    if (!category) throw new NotFoundException('No category found');
+      if (!category) throw new NotFoundException('No category found');
+    }
 
     const newPost = await this.prisma.posts.create({
       data: {
-        title: data.title,
-        createdBy: data.createdBy,
-        category: data.category,
-        images: data.images,
-        tags: data.tags,
-        location: data.location ? { ...data.location } : null,
+        ...data,
+        location: data.location ? { ...data.location } : {},
       },
     });
 

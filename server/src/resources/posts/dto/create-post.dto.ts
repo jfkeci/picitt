@@ -46,17 +46,15 @@ export class CreatePostDto {
 
   @IsNumber()
   @IsOptional()
-  category?: number;
+  category: number;
 
   @IsArray()
-  @ValidateNested({ each: true })
   @IsString({ each: true })
   @ArrayMaxSize(10)
   @ArrayMinSize(1)
   images: Array<string>;
 
   @IsArray()
-  @ValidateNested({ each: true })
   @IsString({ each: true })
   @IsOptional()
   tags?: string[];
