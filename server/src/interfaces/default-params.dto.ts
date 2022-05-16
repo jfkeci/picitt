@@ -29,3 +29,13 @@ export class CategoryIdParamDto {
   @IsNotEmpty()
   categoryId: number;
 }
+
+export class PostCommentsParamsDto {
+  postId: string;
+  commentId: string;
+}
+
+export class PostCommentLikeParamsDto {
+  postId: string;
+  commentId: string;
+}

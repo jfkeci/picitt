@@ -14,8 +14,15 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  async findOne(query: any) {
+  async findOne(query: Record<string, any>) {
     return await this.prisma.users.findUnique({ where: query });
+  }
+
+  async getUserPosts(query: Record<string, any>) {
+    return await this.prisma.users.findUnique({
+      where: query,
+      include: { posts: { include: { comments: true } } },
+    });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

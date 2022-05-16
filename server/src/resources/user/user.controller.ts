@@ -1,7 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserIdParamDto } from 'src/interfaces/default-params.dto';
 
 @Controller('user')
 export class UserController {
@@ -17,18 +26,23 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  @Get('/:userId')
+  findOne(@Param() param: UserIdParamDto) {
+    return this.userService.findOne({ id: Number(param.userId) });
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Get('/:userId/posts')
+  getUserPosts(@Param() param: UserIdParamDto) {
+    return this.userService.getUserPosts({ id: Number(param.userId) });
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  @Patch(':userId')
+  update(@Param() param: UserIdParamDto, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(Number(param.userId), updateUserDto);
+  }
+
+  @Delete(':userId')
+  remove(@Param() param: UserIdParamDto) {
+    return this.userService.remove(Number(param.userId));
   }
 }
