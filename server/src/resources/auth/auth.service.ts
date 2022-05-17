@@ -3,7 +3,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -12,25 +12,23 @@ import * as bcrypt from 'bcrypt';
 import { generateJwt, generateToken } from 'src/utils/gen-token.util';
 import { sendEmail } from 'src/utils/mailer.util';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly userService: UserService
+  ) {}
 
   async registerUser(data: RegisterUserDto) {
-    let user = await this.prisma.users.findUnique({
-      where: { email: data.email },
-    });
+    let user = await this.userService._findByEmail(data.email);
 
     if (user) {
       throw new ConflictException('User with this email already exists');
     }
 
-    user = null;
-
-    user = await this.prisma.users.findUnique({
-      where: { username: data.username },
-    });
+    user = await this.userService._findByUsername(data.username);
 
     if (user) {
       throw new ConflictException('User with this username already exists');
@@ -41,7 +39,7 @@ export class AuthService {
     const token = generateToken();
 
     const newUser = await this.prisma.users.create({
-      data: { ...data, emailVerificationToken: token },
+      data: { ...data, emailVerificationToken: token }
     });
 
     if (!newUser) throw new BadRequestException('Failed to create user');
@@ -59,7 +57,7 @@ export class AuthService {
       </a>
       </h3>
       <br><br>
-      </html>`,
+      </html>`
     });
 
     return newUser;
@@ -93,7 +91,7 @@ export class AuthService {
     if (await bcrypt.compare(data.password, user.password)) {
       return {
         ...user,
-        token: await generateJwt({ id: user.id, username: user.username }),
+        token: await generateJwt({ id: user.id, username: user.username })
       };
     } else {
       throw new UnauthorizedException('Not authorised');
@@ -102,7 +100,7 @@ export class AuthService {
 
   async verifyEmail(data: VerifyEmailDto) {
     const user = await this.prisma.users.findFirst({
-      where: { id: Number(data.userId), emailVerificationToken: data.token },
+      where: { id: Number(data.userId), emailVerificationToken: data.token }
     });
 
     if (!user) throw new NotFoundException('No user found');
@@ -111,8 +109,8 @@ export class AuthService {
       where: { id: Number(data.userId) },
       data: {
         emailVerificationToken: '',
-        isEmailVerified: true,
-      },
+        isEmailVerified: true
+      }
     });
 
     return updatedUser;

@@ -1,10 +1,11 @@
 import {
   BadRequestException,
   CanActivate,
+  ConflictException,
   ExecutionContext,
   ForbiddenException,
   Injectable,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { ModuleRef, Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
@@ -21,13 +22,13 @@ interface JwtPayloadId extends jwt.JwtPayload {
 export class AuthGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private readonly moduleRef: ModuleRef,
+    private readonly moduleRef: ModuleRef
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
       context.getHandler(),
-      context.getClass(),
+      context.getClass()
     ]);
 
     let userId;
@@ -58,12 +59,16 @@ export class AuthGuard implements CanActivate {
 
     try {
       const userService = await this.moduleRef.get(UserService, {
-        strict: false,
+        strict: false
       });
 
       const user = await userService.findOne({ id: Number(userId) });
 
       if (!user) throw new UnauthorizedException('Not authorized');
+
+      if (!user.isEmailVerified) {
+        throw new ConflictException('Email not verified');
+      }
     } catch (err) {
       throw new UnauthorizedException('Not authorized');
     }
