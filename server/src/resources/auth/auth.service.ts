@@ -66,8 +66,6 @@ export class AuthService {
   async loginUser(data: LoginUserDto) {
     let query;
 
-    console.log('data', data);
-
     if (!data) {
       throw new BadRequestException('Provide email or username with password');
     }
@@ -99,19 +97,19 @@ export class AuthService {
   }
 
   async verifyEmail(data: VerifyEmailDto) {
-    const user = await this.prisma.users.findFirst({
-      where: { id: Number(data.userId), emailVerificationToken: data.token }
+    const user = await this.userService._findUniqueByQuery({
+      id: Number(data.userId),
+      emailVerificationToken: data.token
     });
 
     if (!user) throw new NotFoundException('No user found');
 
-    const updatedUser = await this.prisma.users.update({
-      where: { id: Number(data.userId) },
-      data: {
-        emailVerificationToken: '',
-        isEmailVerified: true
-      }
-    });
+    const updatedUser = await this.userService._updateOne(
+      { id: Number(data.userId) },
+      { emailVerificationToken: '', isEmailVerified: true }
+    );
+
+    if (!updatedUser) throw new BadRequestException('Failed to update user');
 
     return updatedUser;
   }

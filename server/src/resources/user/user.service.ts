@@ -101,6 +101,13 @@ export class UserService {
     return await this.prisma.users.create({ data: { ...data } });
   }
 
+  async _updateOne(filter: Record<string, any>, query: Record<string, any>) {
+    return await this.prisma.users.update({
+      where: filter,
+      data: query
+    });
+  }
+
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
