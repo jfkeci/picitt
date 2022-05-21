@@ -1,24 +1,47 @@
-# client
+# Picture gallery
 
-## Project setup
-```
+## Github
+https://github.com/jfkeci
+
+
+### App
+https://github.com/jfkeci/picitt
+
+
+### API
+https://github.com/jfkeci/picitt/tree/main/server
+
+
+
+
+## Local setup
+
+
+### App
+
+Install dependencies
+```bash
 npm install
 ```
 
-### Compiles and hot-reloads for development
-```
+Serve app localy
+```bash
 npm run serve
 ```
 
-### Compiles and minifies for production
-```
-npm run build
+
+
+
+### API
+
+```bash
+npm install
 ```
 
-### Lints and fixes files
-```
-npm run lint
+Serve app localy
+```bash
+npm start
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+When you run the API locally you can se basic example of swagger api documentation at:
+http://localhost:5001/api-docs
