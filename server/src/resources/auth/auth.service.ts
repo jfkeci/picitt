@@ -13,6 +13,8 @@ import { generateJwt, generateToken } from 'src/utils/gen-token.util';
 import { sendEmail } from 'src/utils/mailer.util';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { UserService } from '../user/user.service';
+import { JwtPayloadId } from 'src/guards/auth.guard';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +24,12 @@ export class AuthService {
   ) {}
 
   async registerUser(data: RegisterUserDto) {
+    if (data.password != data.confirmPassword) {
+      throw new ConflictException('Password confirmation failed');
+    }
+
+    delete data.confirmPassword;
+
     let user = await this.userService._findByEmail(data.email);
 
     if (user) {
@@ -39,28 +47,43 @@ export class AuthService {
     const token = generateToken();
 
     const newUser = await this.prisma.users.create({
-      data: { ...data, emailVerificationToken: token }
+      data: {
+        ...data,
+        emailVerificationToken:
+          process.env.NODE_ENV == 'development' ? '' : token,
+        isEmailVerified: process.env.NODE_ENV == 'development' ? true : false
+      }
     });
 
     if (!newUser) throw new BadRequestException('Failed to create user');
 
-    await sendEmail({
-      from: 'picitt@info.com',
-      to: newUser.email,
-      subject: 'Verify your email',
-      html: `<html>
+    const emailConfirmationUrl = `${process.env.BASE_URL}/api/auth/verify/${newUser.id}/${token}`;
+
+    if (process.env.NODE_ENV != 'development') {
+      await sendEmail({
+        from: 'picitt@info.com',
+        to: newUser.email,
+        subject: 'Verify your email',
+        html: `<html>
       <h1>Email verification</h1>
       <br><hr><br>
       <h3>
-      <a href="${process.env.BASE_URL}/auth/verify/${newUser.id}/${token}">
+      <a href="${emailConfirmationUrl}">
       Verify email
       </a>
       </h3>
       <br><br>
       </html>`
-    });
+      });
+    }
 
-    return newUser;
+    return {
+      ...newUser,
+      password: null,
+      emailVerificationToken: null,
+      verifyEmailUrl: `${emailConfirmationUrl}`,
+      token: await generateJwt({ id: newUser.id, username: newUser.username })
+    };
   }
 
   async loginUser(data: LoginUserDto) {
@@ -83,12 +106,13 @@ export class AuthService {
     if (!user) throw new NotFoundException('No user found');
 
     if (!user.isEmailVerified) {
-      throw new BadRequestException('User not verified');
+      throw new ConflictException('User not verified');
     }
 
     if (await bcrypt.compare(data.password, user.password)) {
       return {
         ...user,
+        password: null,
         token: await generateJwt({ id: user.id, username: user.username })
       };
     } else {
@@ -97,7 +121,7 @@ export class AuthService {
   }
 
   async verifyEmail(data: VerifyEmailDto) {
-    const user = await this.userService._findUniqueByQuery({
+    const user = await this.userService._findFirstByQuery({
       id: Number(data.userId),
       emailVerificationToken: data.token
     });

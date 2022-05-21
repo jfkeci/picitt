@@ -5,7 +5,7 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
+  Delete
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -20,7 +20,7 @@ export class PostsController {
     return this.postsService.create(post);
   }
 
-  @Get()
+  @Get('')
   findAll() {
     return this.postsService.findAll();
   }

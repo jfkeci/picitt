@@ -5,14 +5,14 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
+  Delete
 } from '@nestjs/common';
 import { CommentIdParamDto } from 'src/interfaces/default-params.dto';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 
-@Controller('/:postId/')
+@Controller('')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
@@ -34,7 +34,7 @@ export class CommentsController {
   @Patch('/:commentId')
   update(
     @Param() param: CommentIdParamDto,
-    @Body() updateCommentDto: UpdateCommentDto,
+    @Body() updateCommentDto: UpdateCommentDto
   ) {
     return this.commentsService.update(param.commentId, updateCommentDto);
   }

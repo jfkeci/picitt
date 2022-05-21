@@ -112,7 +112,6 @@ model users {
   username                                   String          @unique(map: "username_UNIQUE") @db.VarChar(45)
   email                                      String          @unique(map: "email_UNIQUE") @db.VarChar(127)
   password                                   String          @db.VarChar(127)
-  birthdate                                  DateTime?       @db.Date
   createdAt                                  DateTime?       @default(now()) @db.DateTime(0)
   updatedAt                                  DateTime?       @default(now()) @db.DateTime(0)
   bio                                        String?         @db.VarChar(127)

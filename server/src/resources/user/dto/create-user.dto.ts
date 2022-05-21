@@ -20,8 +20,4 @@ export class CreateUserDto {
   @IsNotEmpty({ message: '"password" should not be empty' })
   @Length(8, 125)
   password: string;
-
-  @IsDateString({ message: '"birthdate" should be a valid date string' })
-  @IsNotEmpty({ message: '"birthdate" should not be empty' })
-  birthdate: Date;
 }

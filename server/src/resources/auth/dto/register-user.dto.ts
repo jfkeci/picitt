@@ -1,4 +1,11 @@
-import { IsDateString, IsNotEmpty, IsString, Length } from 'class-validator';
+import {
+  Equals,
+  IsDateString,
+  IsNotEmpty,
+  IsString,
+  Length,
+  Matches
+} from 'class-validator';
 
 export class RegisterUserDto {
   @IsString({ message: '"name" should be a valid string' })
@@ -21,7 +28,7 @@ export class RegisterUserDto {
   @Length(8, 125)
   password: string;
 
-  @IsDateString({ message: '"birthdate" should be a valid date string' })
-  @IsNotEmpty({ message: '"birthdate" should not be empty' })
-  birthdate: Date;
+  @IsString({ message: '"confirmPassword" should be a valid string' })
+  @Length(8, 125)
+  confirmPassword: string;
 }

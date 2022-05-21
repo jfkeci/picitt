@@ -26,8 +26,4 @@ export class UpdateUserDto {
   @IsOptional()
   @Length(8, 125)
   password?: string;
-
-  @IsDateString({ message: '"birthdate" should be a valid date string' })
-  @IsOptional()
-  birthdate?: Date;
 }

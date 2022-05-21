@@ -14,36 +14,32 @@ export const routerConfig = [
     children: [
       {
         path: 'followers',
-        module: FollowersModule,
-      },
-    ],
+        module: FollowersModule
+      }
+    ]
   },
   {
     path: 'posts',
     module: PostsModule,
     children: [
       {
-        path: 'comments',
+        path: ':postId/comments',
         module: CommentsModule,
         children: [
           {
             path: 'likes',
-            module: CommentLikesModule,
-          },
-        ],
-      },
-      {
-        path: 'likes',
-        module: PostLikesModule,
-      },
-    ],
+            module: CommentLikesModule
+          }
+        ]
+      }
+    ]
   },
   {
     path: 'categories',
-    module: CategoriesModule,
+    module: CategoriesModule
   },
   {
     path: 'auth',
-    module: AuthModule,
-  },
+    module: AuthModule
+  }
 ];

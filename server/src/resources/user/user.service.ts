@@ -97,6 +97,10 @@ export class UserService {
     return await this.prisma.users.findUnique({ where: query });
   }
 
+  async _findFirstByQuery(query: Record<string, any>) {
+    return await this.prisma.users.findFirst({ where: query });
+  }
+
   async _createOne(data: CreateUserDto) {
     return await this.prisma.users.create({ data: { ...data } });
   }

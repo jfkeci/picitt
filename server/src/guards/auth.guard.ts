@@ -14,7 +14,7 @@ import * as jwt from 'jsonwebtoken';
 import { UserService } from 'src/resources/user/user.service';
 import { Role } from 'src/interfaces/role.enum';
 
-interface JwtPayloadId extends jwt.JwtPayload {
+export interface JwtPayloadId extends jwt.JwtPayload {
   id?: any;
 }
 
